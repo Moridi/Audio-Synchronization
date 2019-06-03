@@ -28,12 +28,12 @@
 
 /*
  * A simple RTP server 
- *  sends the output of alsasrc as alaw encoded RTP on port 5002, RTCP is sent on
+ *  sends the output of alsasrc as opus encoded RTP on port 5002, RTCP is sent on
  *  port 5003. The destination is 127.0.0.1.
  *  the receiver RTCP reports are received on port 5007
  *
  * .-------.    .-------.    .-------.      .----------.     .-------.
- * |alsasrc|    |alawenc|    |pcmapay|      | rtpbin   |     |udpsink|  RTP
+ * |alsasrc|    |opusenc|    |opuspay|      | rtpbin   |     |udpsink|  RTP
  * |      src->sink    src->sink    src->send_rtp send_rtp->sink     | port=5002
  * '-------'    '-------'    '-------'      |          |     '-------'
  *                                          |          |      
@@ -49,12 +49,21 @@
 /* change this to send the RTP data and RTCP to another host */
 #define DEST_HOST "127.0.0.1"
 
+// /* #define AUDIO_SRC  "alsasrc" */
+// #define AUDIO_SRC  "audiotestsrc"
+// // #define AUDIO_SRC  "jackaudiosrc"
+
+// /* the encoder and payloader elements */
+// #define AUDIO_ENC  "opusenc"
+// #define AUDIO_PAY  "rtpopuspay"
+
 /* #define AUDIO_SRC  "alsasrc" */
-#define AUDIO_SRC  "jackaudiosrc"
+#define AUDIO_SRC  "audiotestsrc"
 
 /* the encoder and payloader elements */
 #define AUDIO_ENC  "alawenc"
 #define AUDIO_PAY  "rtppcmapay"
+
 
 /* print the stats of a source */
 static void

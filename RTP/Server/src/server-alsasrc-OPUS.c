@@ -49,21 +49,13 @@
 /* change this to send the RTP data and RTCP to another host */
 #define DEST_HOST "127.0.0.1"
 
-// /* #define AUDIO_SRC  "alsasrc" */
-// #define AUDIO_SRC  "audiotestsrc"
-// // #define AUDIO_SRC  "jackaudiosrc"
-
-// /* the encoder and payloader elements */
-// #define AUDIO_ENC  "opusenc"
-// #define AUDIO_PAY  "rtpopuspay"
-
 /* #define AUDIO_SRC  "alsasrc" */
+// #define AUDIO_SRC  "jackaudiosrc"
 #define AUDIO_SRC  "audiotestsrc"
 
 /* the encoder and payloader elements */
-#define AUDIO_ENC  "alawenc"
-#define AUDIO_PAY  "rtppcmapay"
-
+#define AUDIO_ENC  "opusenc"
+#define AUDIO_PAY  "rtpopuspay"
 
 /* print the stats of a source */
 static void

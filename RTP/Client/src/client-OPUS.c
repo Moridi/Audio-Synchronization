@@ -45,16 +45,10 @@
 /* the caps of the sender RTP stream. This is usually negotiated out of band with
  * SDP or RTSP. */
 
-// #define AUDIO_CAPS "application/x-rtp,media=(string)audio,clock-rate=(int)8000,encoding-name=(string)OPUS"
+#define AUDIO_CAPS "application/x-rtp,media=(string)audio,clock-rate=(int)48000,encoding-name=(string)OPUS"
 
-// #define AUDIO_DEPAY "rtpopusdepay"
-// #define AUDIO_DEC   "opusdec"
-// #define AUDIO_SINK  "autoaudiosink"
-
-#define AUDIO_CAPS "application/x-rtp,media=(string)audio,clock-rate=(int)8000,encoding-name=(string)PCMA"
-
-#define AUDIO_DEPAY "rtppcmadepay"
-#define AUDIO_DEC   "alawdec"
+#define AUDIO_DEPAY "rtpopusdepay"
+#define AUDIO_DEC   "opusdec"
 #define AUDIO_SINK  "autoaudiosink"
 
 /* the destination machine to send RTCP to. This is the address of the sender and

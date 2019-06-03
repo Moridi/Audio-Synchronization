@@ -21,7 +21,7 @@
 # change this to send the RTP data and RTCP to another host
 DEST=127.0.0.1
 
-AELEM=autoaudiosrc
+AELEM=audiotestsrc
 # AELEM=jackaudiosrc
 
 # OPUS encode from an the source

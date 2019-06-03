@@ -50,7 +50,7 @@
 #define DEST_HOST "127.0.0.1"
 
 /* #define AUDIO_SRC  "alsasrc" */
-#define AUDIO_SRC  "audiotestsrc"
+#define AUDIO_SRC  "jackaudiosrc"
 
 /* the encoder and payloader elements */
 #define AUDIO_ENC  "alawenc"

@@ -5,21 +5,21 @@ INCLUDE_DIR = include
 CFLAGS = -I$(INCLUDE_DIR)
 CFLAGS = `pkg-config --cflags --libs gstreamer-1.0`
 
-EXECUTABLE_FILE = server-alsasrc-PCMA.out
+EXECUTABLE_FILE = server-alsasrc-OPUS.out
 
 OBJECTS = \
-	$(BUILD_DIR)/server-alsasrc-PCMA.o
+	$(BUILD_DIR)/server-alsasrc-OPUS.o
 
 DynamicSensitivityList = \
-	$(SRC_DIR)/server-alsasrc-PCMA.c \
+	$(SRC_DIR)/server-alsasrc-OPUS.c \
 
 all: $(BUILD_DIR) $(EXECUTABLE_FILE)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
-$(BUILD_DIR)/server-alsasrc-PCMA.o: $(DynamicSensitivityList)
-	$(CC) -c $(SRC_DIR)/server-alsasrc-PCMA.c -o $(BUILD_DIR)/server-alsasrc-PCMA.o $(CFLAGS)
+$(BUILD_DIR)/server-alsasrc-OPUS.o: $(DynamicSensitivityList)
+	$(CC) -c $(SRC_DIR)/server-alsasrc-OPUS.c -o $(BUILD_DIR)/server-alsasrc-OPUS.o $(CFLAGS)
 
 $(EXECUTABLE_FILE): $(OBJECTS)
 	$(CC) $(OBJECTS) -o $(EXECUTABLE_FILE) $(CFLAGS)

@@ -5,21 +5,21 @@ INCLUDE_DIR = include
 CFLAGS = -I$(INCLUDE_DIR)
 CFLAGS = `pkg-config --cflags --libs gstreamer-1.0`
 
-EXECUTABLE_FILE = client-PCMA.out
+EXECUTABLE_FILE = client-OPUS.out
 
 OBJECTS = \
-	$(BUILD_DIR)/client-PCMA.o
+	$(BUILD_DIR)/client-OPUS.o
 
 DynamicSensitivityList = \
-	$(SRC_DIR)/client-PCMA.c \
+	$(SRC_DIR)/client-OPUS.c \
 
 all: $(BUILD_DIR) $(EXECUTABLE_FILE)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
-$(BUILD_DIR)/client-PCMA.o: $(DynamicSensitivityList)
-	$(CC) -c $(SRC_DIR)/client-PCMA.c -o $(BUILD_DIR)/client-PCMA.o $(CFLAGS)
+$(BUILD_DIR)/client-OPUS.o: $(DynamicSensitivityList)
+	$(CC) -c $(SRC_DIR)/client-OPUS.c -o $(BUILD_DIR)/client-OPUS.o $(CFLAGS)
 
 $(EXECUTABLE_FILE): $(OBJECTS)
 	$(CC) $(OBJECTS) -o $(EXECUTABLE_FILE) $(CFLAGS)

@@ -25,11 +25,11 @@
 /*
  * A simple RTP receiver 
  *
- *  receives alaw encoded RTP audio on port 5002, RTCP is received on  port 5003.
+ *  receives opus encoded RTP audio on port 5002, RTCP is received on  port 5003.
  *  the receiver RTCP reports are sent to port 5007
  *
  *             .-------.      .----------.     .---------.   .-------.   .--------.
- *  RTP        |udpsrc |      | rtpbin   |     |pcmadepay|   |alawdec|   |alsasink|
+ *  RTP        |udpsrc |      | rtpbin   |     |opusdepay|   |opusdec|   |alsasink|
  *  port=5002  |      src->recv_rtp recv_rtp->sink     src->sink   src->sink      |
  *             '-------'      |          |     '---------'   '-------'   '--------'
  *                            |          |      
@@ -44,11 +44,11 @@
 
 /* the caps of the sender RTP stream. This is usually negotiated out of band with
  * SDP or RTSP. */
-#define AUDIO_CAPS "application/x-rtp,media=(string)audio,clock-rate=(int)8000,encoding-name=(string)PCMA"
+#define AUDIO_CAPS "application/x-rtp,media=(string)audio,clock-rate=(int)8000,encoding-name=(string)OPUS"
 
-#define AUDIO_DEPAY "rtppcmadepay"
-#define AUDIO_DEC   "alawdec"
-#define AUDIO_SINK  "autoaudiosink"
+#define AUDIO_DEPAY "rtpopusdepay"
+#define AUDIO_DEC   "opusdec"
+#define AUDIO_SINK  "jackaudiosink"
 
 /* the destination machine to send RTCP to. This is the address of the sender and
  * is used to send back the RTCP reports of this receiver. If the data is sent
@@ -124,7 +124,7 @@ pad_added_cb (GstElement * rtpbin, GstPad * new_pad, GstElement * depay)
  *
  * gst-launch-1.0 -v rtpbin name=rtpbin                                                \
  *      udpsrc caps=$AUDIO_CAPS port=5002 ! rtpbin.recv_rtp_sink_0              \
- *        rtpbin. ! rtppcmadepay ! alawdec ! audioconvert ! audioresample ! autoaudiosink \
+ *        rtpbin. ! rtpopusdepay ! opusdec ! audioconvert ! audioresample ! jackaudiosink \
  *      udpsrc port=5003 ! rtpbin.recv_rtcp_sink_0                              \
  *        rtpbin.send_rtcp_src_0 ! udpsink port=5007 host=$DEST sync=false async=false
  */

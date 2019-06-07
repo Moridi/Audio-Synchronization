@@ -51,9 +51,10 @@ void add_decoder()
     audiodepay = gst_element_factory_make(AUDIO_DEPAY, "audiodepay");
     g_assert(audiodepay);
 
-    // @TODO: PLC
     audiodec = gst_element_factory_make(AUDIO_DEC, "audiodec");
     g_assert(audiodec);
+    g_object_set(audiodec, "plc", TRUE, NULL);
+    
     /* the audio playback and format conversion */
     audioconv = gst_element_factory_make("audioconvert", "audioconv");
     g_assert(audioconv);
@@ -63,6 +64,7 @@ void add_decoder()
     // @TODO: drift-tolerance, sync, slave-method
     audiosink = gst_element_factory_make(AUDIO_SINK, "audiosink");
     g_assert(audiosink);
+    // g_object_set(audiodec, "plc", TRUE, NULL);
 
     /* add depayloading and playback to the pipeline and link */
     gst_bin_add_many(GST_BIN(pipeline), audiodepay, audiodec, audioconv,
@@ -76,9 +78,13 @@ void add_decoder()
 void add_rtpbin()
 {
     /* the rtpbin element */
-    // @TODO: buffer-mode, ntp-sync
     rtpbin = gst_element_factory_make("rtpbin", "rtpbin");
     g_assert(rtpbin);
+
+    // @TODO: Uncomment it.
+    // BUFFER_MODE_NONE = 0
+    // g_object_set(rtpbin, "buffer-mode", 0, NULL);
+    g_object_set(rtpbin, "ntp-sync", TRUE, NULL);
 
     gst_bin_add(GST_BIN(pipeline), rtpbin);
 }

@@ -50,6 +50,8 @@ void add_decoder()
     /* the depayloading and decoding */
     audiodepay = gst_element_factory_make(AUDIO_DEPAY, "audiodepay");
     g_assert(audiodepay);
+
+    // @TODO: PLC
     audiodec = gst_element_factory_make(AUDIO_DEC, "audiodec");
     g_assert(audiodec);
     /* the audio playback and format conversion */
@@ -57,6 +59,8 @@ void add_decoder()
     g_assert(audioconv);
     audiores = gst_element_factory_make("audioresample", "audiores");
     g_assert(audiores);
+
+    // @TODO: drift-tolerance, sync, slave-method
     audiosink = gst_element_factory_make(AUDIO_SINK, "audiosink");
     g_assert(audiosink);
 
@@ -72,6 +76,7 @@ void add_decoder()
 void add_rtpbin()
 {
     /* the rtpbin element */
+    // @TODO: buffer-mode, ntp-sync
     rtpbin = gst_element_factory_make("rtpbin", "rtpbin");
     g_assert(rtpbin);
 

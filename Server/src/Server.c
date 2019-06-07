@@ -57,7 +57,10 @@ void add_rtpbin()
 
 void add_udp_terminals()
 {
+  // Periodic ticks waveform
   g_object_set (audiosrc, "wave", 8, NULL);
+  
+  // Make the server act as a live source
   g_object_set (audiosrc, "is-live", TRUE, NULL);
 
   /* the udp sinks and source we will use for RTP and RTCP */

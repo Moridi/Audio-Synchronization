@@ -58,6 +58,7 @@ void add_rtpbin()
 void add_udp_terminals()
 {
   g_object_set (audiosrc, "wave", 8, NULL);
+  g_object_set (audiosrc, "is-live", TRUE, NULL);
 
   /* the udp sinks and source we will use for RTP and RTCP */
   rtpsink = gst_element_factory_make("udpsink", "rtpsink");

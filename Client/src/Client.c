@@ -64,7 +64,7 @@ void add_decoder()
     // @TODO: drift-tolerance, sync, slave-method
     audiosink = gst_element_factory_make(AUDIO_SINK, "audiosink");
     g_assert(audiosink);
-    // g_object_set(audiodec, "plc", TRUE, NULL);
+    g_object_set(audiosink, "sync", TRUE, NULL);
 
     /* add depayloading and playback to the pipeline and link */
     gst_bin_add_many(GST_BIN(pipeline), audiodepay, audiodec, audioconv,

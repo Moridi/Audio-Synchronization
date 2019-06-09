@@ -1,22 +1,23 @@
 #!/bin/sh
 #
-# A simple RTP receiver
+# A RTP receiver 
 #
 #  receives opus encoded RTP audio on port 5002, RTCP is received on  port 5003.
 #  the receiver RTCP reports are sent to port 5007
 #
-#             .-------.      .----------.     .---------.   .-------.   .-------------.
-#  RTP        |udpsrc |      | rtpbin   |     |opusdepay|   |opusdec|   |autoaudiosink|
-#  port=5002  |      src->recv_rtp recv_rtp->sink     src->sink   src->sink           |
-#             '-------'      |          |     '---------'   '-------'   '-------------'
-#                            |          |
-#                            |          |     .-------.
-#                            |          |     |udpsink|  RTCP
-#                            |    send_rtcp->sink     | port=5007
-#             .-------.      |          |     '-------' sync=false
-#  RTCP       |udpsrc |      |          |               async=false
-#  port=5003  |     src->recv_rtcp      |
-#             '-------'      '----------'
+#             .-------.      .-------------.     .---------.   .-------.   .--------.
+#  RTP        |udpsrc |      | rtpbin      |     |opusdepay|   |opusdec|   |alsasink|
+#  port=5002  |      src->recv_rtp recv_rtp->sink     src->sink   src->sink         |
+#  live       '-------'      |             |     '---------'   '-------'   '--------'
+#                            |             |      
+#                            |             |       .-------.
+#                            |             |       |udpsink|   RTCP
+#                            |         send_rtcp->sink     |   port=5007
+#             .-------.      |             |       '-------'   sync=false
+#  RTCP       |udpsrc |      |             |                   async=false
+#  port=5003  |     src->recv_rtcp         |                       
+#             '-------'      '-------------'              
+#
 
 
 # the caps of the sender RTP stream. This is usually negotiated out of band with

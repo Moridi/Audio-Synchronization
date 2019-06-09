@@ -1,22 +1,23 @@
 #!/bin/sh
 #
-# A simple RTP server
-#  sends the output of autoaudiosrc as opus encoded RTP on port 5002, RTCP is sent on
+# A RTP server 
+#  sends the output of alsasrc as opus encoded RTP on port 5002, RTCP is sent on
 #  port 5003. The destination is 127.0.0.1.
 #  the receiver RTCP reports are received on port 5007
 #
-# .--------.    .-------.    .-------.      .----------.     .-------.
-# |audiosrc|    |opusenc|    |opuspay|      | rtpbin   |     |udpsink|  RTP
-# |       src->sink    src->sink    src->send_rtp send_rtp->sink     | port=5002
-# '--------'    '-------'    '-------'      |          |     '-------'
-#                                           |          |
-#                                           |          |     .-------.
-#                                           |          |     |udpsink|  RTCP
-#                                           |    send_rtcp->sink     | port=5003
-#                            .-------.      |          |     '-------' sync=false
-#                 RTCP       |udpsrc |      |          |               async=false
-#               port=5007    |     src->recv_rtcp      |
-#                            '-------'      '----------'
+# .------------.   .-------.   .-------.      .-----------------.     .-------.
+# |audiotestsrc|   |opusenc|   |opuspay|      | rtpbin          |     |udpsink|  RTP
+# |         src->sink   src->sink    src->send_rtp   send_rtp->sink   |    port=5002
+# '------------'   '-------'   '-------'      |                 |     '-------'
+#                                             |                 |      
+#                                             |                 |     .-------.
+#                                             |                 |     |udpsink|  RTCP
+#                                             |        send_rtcp->sink        | port=5003
+#                              .-------.      |                 |     '-------' sync=false
+#                      RTCP    |udpsrc |      |                 |               async=false
+#                  port=5007   |    src->recv_rtcp              |                       
+#                              '-------'      '-----------------'              
+#
 
 # change this to send the RTP data and RTCP to another host
 DEST=127.0.0.1
@@ -25,7 +26,7 @@ AELEM=audiotestsrc
 # AELEM=jackaudiosrc
 
 # OPUS encode from an the source
-ASOURCE="$AELEM ! audioconvert ! audioresample"
+ASOURCE="$AELEM wave=8 is-live=TRUE ! audioconvert ! audioresample"
 AENC="opusenc  bitrate=256000 ! rtpopuspay"
 
 gst-launch-1.0 -v rtpbin name=rtpbin \

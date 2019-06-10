@@ -5,6 +5,7 @@
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include <gst/gst.h>
 
@@ -23,10 +24,32 @@ GstElement *rtcpsink[NUMBER_OF_CLIENTS];
 GstElement *rtcpsrc[NUMBER_OF_CLIENTS];
 GstElement *pipeline;
 GMainLoop *loop;
-GstPad *srcpad, *sinkpad;
+GstPad *srcpad[NUMBER_OF_CLIENTS];
+GstPad *sinkpad[NUMBER_OF_CLIENTS];
 
-void setup_first_client(int client_id)
+char* append_integer(char* string, int integer, char** result)
 {
+  char* integer_string = (char*)malloc(sizeof(char) * 32);
+  sprintf(integer_string, "%d", integer);
+
+  (*result) = (char*)malloc(sizeof(char) * 64);
+  int i = 0;
+
+  while(string[i])
+  {
+    (*result)[i] = string[i];
+    i++;
+  }
+
+  strcat((*result), integer_string);
+
+  return (*result);
+}
+
+void setup_client(int argc, char *argv[], int client_id)
+{  
+  char* message;
+
   add_audio_elements(client_id);
 
   add_udp_terminals(CLIENTS_PORTS[client_id][RTP_PORT_IDX],
@@ -34,26 +57,14 @@ void setup_first_client(int client_id)
       CLIENTS_PORTS[client_id][RTCP_RCV_PORT_IDX],
       client_id);
     
-  link_to_rtpbin("send_rtp_sink_0", client_id);
-  get_rtp_source_pad("send_rtp_src_0", client_id);
-  get_rtcp_source_pad("send_rtcp_src_0", client_id);
-  receive_rtcp("recv_rtcp_sink_0", client_id);
-}
-
-void setup_second_client(int client_id)
-{
-  link_to_rtpbin("send_rtp_sink_1", client_id);
-  get_rtp_source_pad("send_rtp_src_1", client_id);
-  get_rtcp_source_pad("send_rtcp_src_1", client_id);
-  receive_rtcp("recv_rtcp_sink_1", client_id);
-}
-
-void setup_client(int argc, char *argv[], int client_id)
-{  
-  if (client_id == 0)
-    setup_first_client(client_id);
-  else
-    setup_second_client(client_id);
+  link_to_rtpbin(append_integer("send_rtp_sink_", 
+      client_id, &message), client_id);
+  get_rtp_source_pad(append_integer("send_rtp_src_", 
+      client_id, &message), client_id);
+  get_rtcp_source_pad(append_integer("send_rtcp_src_", 
+      client_id, &message), client_id);
+  receive_rtcp(append_integer("recv_rtcp_sink_", 
+      client_id, &message), client_id);
 }
 
 
@@ -133,44 +144,44 @@ void add_udp_terminals(int rtp_sink_port,
 void link_to_rtpbin(const char* request_pad, int client_id)
 {
   /* now link all to the rtpbin, start by getting an RTP sinkpad for session 0 */
-  sinkpad = gst_element_get_request_pad(rtpbin, request_pad);
-  srcpad = gst_element_get_static_pad(audiopay[client_id], "src");
-  if(gst_pad_link(srcpad, sinkpad) != GST_PAD_LINK_OK)
+  sinkpad[client_id] = gst_element_get_request_pad(rtpbin, request_pad);
+  srcpad[client_id] = gst_element_get_static_pad(audiopay[client_id], "src");
+  if(gst_pad_link(srcpad[client_id], sinkpad[client_id]) != GST_PAD_LINK_OK)
     g_error("Failed to link audio payloader to rtpbin");
-  gst_object_unref(srcpad);
+  gst_object_unref(srcpad[client_id]);
 }
 
 void get_rtp_source_pad(const char* static_pad, int client_id)
 {
   /* get the RTP srcpad that was created when we requested the sinkpad above and
    * link it to the rtpsink sinkpad*/
-  srcpad = gst_element_get_static_pad(rtpbin, "send_rtp_src_0");
-  sinkpad = gst_element_get_static_pad(rtpsink[client_id], "sink");
-  if(gst_pad_link(srcpad, sinkpad) != GST_PAD_LINK_OK)
+  srcpad[client_id] = gst_element_get_static_pad(rtpbin, "send_rtp_src_0");
+  sinkpad[client_id] = gst_element_get_static_pad(rtpsink[client_id], "sink");
+  if(gst_pad_link(srcpad[client_id], sinkpad[client_id]) != GST_PAD_LINK_OK)
     g_error("Failed to link rtpbin to rtpsink");
-  gst_object_unref(srcpad);
-  gst_object_unref(sinkpad);
+  gst_object_unref(srcpad[client_id]);
+  gst_object_unref(sinkpad[client_id]);
 }
 
 void get_rtcp_source_pad(const char* request_pad, int client_id)
 {
   /* get an RTCP srcpad for sending RTCP to the receiver */
-  srcpad = gst_element_get_request_pad(rtpbin, request_pad);
-  sinkpad = gst_element_get_static_pad(rtcpsink[client_id], "sink");
-  if(gst_pad_link(srcpad, sinkpad) != GST_PAD_LINK_OK)
+  srcpad[client_id] = gst_element_get_request_pad(rtpbin, request_pad);
+  sinkpad[client_id] = gst_element_get_static_pad(rtcpsink[client_id], "sink");
+  if(gst_pad_link(srcpad[client_id], sinkpad[client_id]) != GST_PAD_LINK_OK)
     g_error("Failed to link rtpbin to rtcpsink");
-  gst_object_unref(sinkpad);
+  gst_object_unref(sinkpad[client_id]);
 }
 
 void receive_rtcp(const char* request_pad, int client_id)
 {
   /* we also want to receive RTCP, request an RTCP sinkpad for session 0 and
    * link it to the srcpad of the udpsrc for RTCP */
-  srcpad = gst_element_get_static_pad(rtcpsrc[client_id], "src");
-  sinkpad = gst_element_get_request_pad(rtpbin, request_pad);
-  if(gst_pad_link(srcpad, sinkpad) != GST_PAD_LINK_OK)
+  srcpad[client_id] = gst_element_get_static_pad(rtcpsrc[client_id], "src");
+  sinkpad[client_id] = gst_element_get_request_pad(rtpbin, request_pad);
+  if(gst_pad_link(srcpad[client_id], sinkpad[client_id]) != GST_PAD_LINK_OK)
     g_error("Failed to link rtcpsrc to rtpbin");
-  gst_object_unref(srcpad);
+  gst_object_unref(srcpad[client_id]);
 }
 
 void setup_pipeline()

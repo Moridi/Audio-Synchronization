@@ -32,4 +32,10 @@
 #define AUDIO_ENC  "opusenc"
 #define AUDIO_PAY  "rtpopuspay"
 
+#define RTP_PORT_IDX 0
+#define RTCP_SEND_PORT_IDX 1
+#define RTCP_RCV_PORT_IDX 2
+
+int FIRST_CLIENT_PORTS[] = {5002, 5003, 5007};
+int* CLIENTS_PORTS[] = {FIRST_CLIENT_PORTS};
 #endif

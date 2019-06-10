@@ -1,9 +1,11 @@
 #ifndef SERVER_H_
 #define SERVER_H_
 
+void setup_client(int argc, char *argv[], int client_id);
 void initialize_pipeline(int argc, char *argv[]);
 void add_rtpbin();
-void add_udp_terminals();
+void add_udp_terminals(int rtp_sink_port,
+    int rtcp_sink_port, int rtcp_src_port);
 void link_to_rtpbin();
 void get_rtp_source_pad();
 void get_rtcp_source_pad();

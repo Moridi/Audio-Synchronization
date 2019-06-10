@@ -1,5 +1,7 @@
 #define GLIB_DISABLE_DEPRECATION_WARNINGS
 
+#include "Server.h"
+
 #include <string.h>
 #include <math.h>
 
@@ -12,6 +14,20 @@ GstElement *rtpbin, *rtpsink, *rtcpsink, *rtcpsrc;
 GstElement *pipeline;
 GMainLoop *loop;
 GstPad *srcpad, *sinkpad;
+
+void setup_client(int argc, char *argv[], int client_id)
+{
+  initialize_pipeline(argc, argv);
+  add_rtpbin();
+  add_udp_terminals(CLIENTS_PORTS[client_id][RTP_PORT_IDX],
+      CLIENTS_PORTS[client_id][RTCP_SEND_PORT_IDX],
+      CLIENTS_PORTS[client_id][RTCP_RCV_PORT_IDX]);
+  link_to_rtpbin();
+  get_rtp_source_pad();
+  get_rtcp_source_pad();
+  receive_rtcp();
+  setup_pipeline();
+}
 
 void initialize_pipeline(int argc, char *argv[])
 {
@@ -55,7 +71,8 @@ void add_rtpbin()
   gst_bin_add(GST_BIN(pipeline), rtpbin);
 }
 
-void add_udp_terminals()
+void add_udp_terminals(int rtp_sink_port,
+    int rtcp_sink_port, int rtcp_src_port)
 {
   // Periodic ticks waveform
   g_object_set (audiosrc, "wave", 8, NULL);

@@ -26,6 +26,7 @@ GstElement *pipeline;
 GMainLoop *loop;
 GstPad *srcpad[NUMBER_OF_CLIENTS];
 GstPad *sinkpad[NUMBER_OF_CLIENTS];
+char* message;
 
 char* append_integer(char* string, int integer, char** result)
 {
@@ -48,8 +49,6 @@ char* append_integer(char* string, int integer, char** result)
 
 void setup_client(int argc, char *argv[], int client_id)
 {  
-  char* message;
-
   add_audio_elements(client_id);
 
   add_udp_terminals(CLIENTS_PORTS[client_id][RTP_PORT_IDX],
@@ -70,25 +69,31 @@ void setup_client(int argc, char *argv[], int client_id)
 
 void add_audio_elements(int client_id)
 {
+
   /* the audio capture and format conversion */
-  audiosrc[client_id] = gst_element_factory_make(AUDIO_SRC, "audiosrc");
+  audiosrc[client_id] = gst_element_factory_make(AUDIO_SRC,
+      append_integer("audiosrc_", client_id, &message));
   g_assert(audiosrc[client_id]);
-  audioconv[client_id] = gst_element_factory_make("audioconvert", "audioconv");
+  audioconv[client_id] = gst_element_factory_make("audioconvert",
+      append_integer("audioconv_", client_id, &message));
   g_assert(audioconv[client_id]);
-  audiores[client_id] = gst_element_factory_make("audioresample", "audiores");
+  audiores[client_id] = gst_element_factory_make("audioresample",
+      append_integer("audiores_", client_id, &message));
   g_assert(audiores[client_id]);
   /* the encoding and payloading */
-  audioenc[client_id] = gst_element_factory_make(AUDIO_ENC, "audioenc");
+  audioenc[client_id] = gst_element_factory_make(AUDIO_ENC,
+      append_integer("audioenc_", client_id, &message));
   g_assert(audioenc[client_id]);
-  audiopay[client_id] = gst_element_factory_make(AUDIO_PAY, "audiopay");
+  audiopay[client_id] = gst_element_factory_make(AUDIO_PAY,
+      append_integer("audiopay_", client_id, &message));
   g_assert(audiopay[client_id]);
 
   /* add capture and payloading to the pipeline and link */
-  gst_bin_add_many(GST_BIN(pipeline), audiosrc[client_id], audioconv[client_id], audiores[client_id],
-      audioenc[client_id], audiopay[client_id], NULL);
+  gst_bin_add_many(GST_BIN(pipeline), audiosrc[client_id], audioconv[client_id],
+      audiores[client_id], audioenc[client_id], audiopay[client_id], NULL);
 
-  if(!gst_element_link_many(audiosrc[client_id], audioconv[client_id], audiores[client_id], audioenc[client_id],
-          audiopay[client_id], NULL)) {
+  if(!gst_element_link_many(audiosrc[client_id], audioconv[client_id],
+      audiores[client_id], audioenc[client_id], audiopay[client_id], NULL)) {
     g_error("Failed to link audiosrc, audioconv, audioresample, "
         "audio encoder and audio payloader");
   }
@@ -123,17 +128,23 @@ void add_udp_terminals(int rtp_sink_port,
   g_object_set (audiosrc[client_id], "is-live", TRUE, NULL);
 
   /* the udp sinks and source we will use for RTP and RTCP */
-  rtpsink[client_id] = gst_element_factory_make("udpsink", "rtpsink");
+  rtpsink[client_id] = gst_element_factory_make("udpsink",
+      append_integer("rtpsink_", client_id, &message));
+
   g_assert(rtpsink[client_id]);
   g_object_set(rtpsink[client_id], "port", rtp_sink_port, "host", DEST_HOST, NULL);
 
-  rtcpsink[client_id] = gst_element_factory_make("udpsink", "rtcpsink");
+  rtcpsink[client_id] = gst_element_factory_make("udpsink",
+      append_integer("rtcpsink_", client_id, &message));
+
   g_assert(rtcpsink[client_id]);
   g_object_set(rtcpsink[client_id], "port", rtcp_sink_port, "host", DEST_HOST, NULL);
   /* no need for synchronisation or preroll on the RTCP sink */
   g_object_set(rtcpsink[client_id], "async", FALSE, "sync", FALSE, NULL);
 
-  rtcpsrc[client_id] = gst_element_factory_make("udpsrc", "rtcpsrc");
+  rtcpsrc[client_id] = gst_element_factory_make("udpsrc",
+      append_integer("rtcpsrc_", client_id, &message));
+
   g_assert(rtcpsrc[client_id]);
   g_object_set(rtcpsrc[client_id], "port", rtcp_src_port, NULL);
 

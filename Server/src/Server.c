@@ -133,13 +133,16 @@ void add_udp_terminals(int rtp_sink_port,
       append_integer("rtpsink_", client_id, &message));
 
   g_assert(rtpsink[client_id]);
-  g_object_set(rtpsink[client_id], "port", rtp_sink_port, "host", DEST_HOST, NULL);
+  g_object_set(rtpsink[client_id], "port", rtp_sink_port, "host",
+      DEST_HOST[client_id], NULL);
 
   rtcpsink[client_id] = gst_element_factory_make("udpsink",
       append_integer("rtcpsink_", client_id, &message));
 
   g_assert(rtcpsink[client_id]);
-  g_object_set(rtcpsink[client_id], "port", rtcp_sink_port, "host", DEST_HOST, NULL);
+  g_object_set(rtcpsink[client_id], "port", rtcp_sink_port, "host",
+      DEST_HOST[client_id], NULL);
+
   /* no need for synchronisation or preroll on the RTCP sink */
   g_object_set(rtcpsink[client_id], "async", FALSE, "sync", FALSE, NULL);
 

@@ -22,7 +22,13 @@
  */
 
 /* change this to send the RTP data and RTCP to another host */
-#define DEST_HOST "127.0.0.1"
+// #define DEST_HOST "127.0.0.1"
+
+char FIRST_CLIENT_IP[] = "172.30.48.122";
+char SECOND_CLINET_IP[] = "172.30.49.65";
+
+char* DEST_HOST[] = {FIRST_CLIENT_IP, SECOND_CLINET_IP};
+
 
 /* #define AUDIO_SRC  "alsasrc" */
 // #define AUDIO_SRC  "jackaudiosrc"

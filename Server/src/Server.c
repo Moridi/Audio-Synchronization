@@ -30,10 +30,10 @@ char* message;
 
 char* append_integer(char* string, int integer, char** result)
 {
-  char* integer_string = (char*)malloc(sizeof(char) * 32);
-  sprintf(integer_string, "%d", integer);
+  // Assume that the integer is only one character
+  int string_size = strlen(string);
 
-  (*result) = (char*)malloc(sizeof(char) * 64);
+  (*result) = (char*)malloc(sizeof(char) * (string_size + 2));
   int i = 0;
 
   while(string[i])
@@ -42,7 +42,8 @@ char* append_integer(char* string, int integer, char** result)
     i++;
   }
 
-  strcat((*result), integer_string);
+  (*result)[i++] = (char)(integer + 48);
+  (*result)[i] = '\0';
 
   return (*result);
 }
@@ -58,7 +59,7 @@ void setup_client(int argc, char *argv[], int client_id)
     
   link_to_rtpbin(append_integer("send_rtp_sink_", 
       client_id, &message), client_id);
-  get_rtp_source_pad(append_integer("send_rtp_src_", 
+  get_rtp_source_pad(append_integer("send_rtp_src_",
       client_id, &message), client_id);
   get_rtcp_source_pad(append_integer("send_rtcp_src_", 
       client_id, &message), client_id);
@@ -166,7 +167,8 @@ void get_rtp_source_pad(const char* static_pad, int client_id)
 {
   /* get the RTP srcpad that was created when we requested the sinkpad above and
    * link it to the rtpsink sinkpad*/
-  srcpad[client_id] = gst_element_get_static_pad(rtpbin, "send_rtp_src_0");
+
+  srcpad[client_id] = gst_element_get_static_pad(rtpbin, static_pad);
   sinkpad[client_id] = gst_element_get_static_pad(rtpsink[client_id], "sink");
   if(gst_pad_link(srcpad[client_id], sinkpad[client_id]) != GST_PAD_LINK_OK)
     g_error("Failed to link rtpbin to rtpsink");

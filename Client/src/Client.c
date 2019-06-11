@@ -1,5 +1,9 @@
+#include "Client.h"
+
 #include <string.h>
 #include <math.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 #include <gst/gst.h>
 #include "Config.h"
@@ -14,7 +18,25 @@ gboolean res;
 GstPadLinkReturn lres;
 GstPad *srcpad, *sinkpad;
 
-void initialize_pipeline(int argc, char *argv[])
+void setup_client(int argc, char *argv[])
+{
+    if (argc < 2)
+    {
+        perror("Run the client like ./client [CLIENT_ID]");
+        return;
+    }
+    initialize_pipeline(argc, argv, atoi(argv[1]));
+    add_decoder();
+    add_rtpbin();
+    link_all_to_rtpbin();
+    get_rtcp_sink_pad();
+    get_rtcp_source_pad();
+    connect_signals();
+    setup_pipeline();
+
+}
+
+void initialize_pipeline(int argc, char *argv[], int client_id)
 {
     /* always init first */
     gst_init(&argc, &argv);
@@ -26,7 +48,9 @@ void initialize_pipeline(int argc, char *argv[])
     /* the udp src and source we will use for RTP and RTCP */
     rtpsrc = gst_element_factory_make("udpsrc", "rtpsrc");
     g_assert(rtpsrc);
-    g_object_set(rtpsrc, "port", 5002, NULL);
+    g_object_set(rtpsrc, "port",
+            CLIENTS_PORTS[client_id][RTP_PORT_IDX], NULL);
+
     /* we need to set caps on the udpsrc for the RTP data */
     caps = gst_caps_from_string(AUDIO_CAPS);
     g_object_set(rtpsrc, "caps", caps, NULL);
@@ -34,11 +58,15 @@ void initialize_pipeline(int argc, char *argv[])
 
     rtcpsrc = gst_element_factory_make("udpsrc", "rtcpsrc");
     g_assert(rtcpsrc);
-    g_object_set(rtcpsrc, "port", 5003, NULL);
+    g_object_set(rtcpsrc, "port",
+            CLIENTS_PORTS[client_id][RTCP_SEND_PORT_IDX], NULL);
 
     rtcpsink = gst_element_factory_make("udpsink", "rtcpsink");
     g_assert(rtcpsink);
-    g_object_set(rtcpsink, "port", 5007, "host", DEST_HOST, NULL);
+    g_object_set(rtcpsink, "port",
+            CLIENTS_PORTS[client_id][RTCP_SEND_PORT_IDX],
+            "host", DEST_HOST, NULL);
+    
     /* no need for synchronisation or preroll on the RTCP sink */
     g_object_set(rtcpsink, "async", FALSE, "sync", FALSE, NULL);
 

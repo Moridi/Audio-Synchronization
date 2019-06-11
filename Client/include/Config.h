@@ -35,4 +35,12 @@
  * from another machine, change this address. */
 #define DEST_HOST "127.0.0.1"
 
+#define RTP_PORT_IDX 0
+#define RTCP_SEND_PORT_IDX 1
+#define RTCP_RCV_PORT_IDX 2
+
+int FIRST_CLIENT_PORTS[] = {5002, 5003, 5007};
+int SECOND_CLIENT_PORTS[] = {5012, 5013, 5017};
+int* CLIENTS_PORTS[] = {FIRST_CLIENT_PORTS, SECOND_CLIENT_PORTS};
+
 #endif

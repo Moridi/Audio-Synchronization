@@ -4,34 +4,30 @@
 /*
  * A RTP server 
  *  sends the output of alsasrc as opus encoded RTP on port 5002, RTCP is sent on
- *  port 5003. The destination is 127.0.0.1.
+ *  port 5003.
  *  the receiver RTCP reports are received on port 5007
  *
- * .------------.   .-------.   .-------.      .-----------------.     .-------.
- * |audiotestsrc|   |opusenc|   |opuspay|      | rtpbin          |     |udpsink|  RTP
- * |         src->sink   src->sink    src->send_rtp   send_rtp->sink   |    port=5002
- * '------------'   '-------'   '-------'      |                 |     '-------'
- *                                             |                 |      
- *                                             |                 |     .-------.
- *                                             |                 |     |udpsink|  RTCP
- *                                             |        send_rtcp->sink        | port=5003
- *                              .-------.      |                 |     '-------' sync=false
- *                      RTCP    |udpsrc |      |                 |               async=false
- *                  port=5007   |    src->recv_rtcp              |                       
- *                              '-------'      '-----------------'              
- */
+ * .------------.   .---------.   .--------.     .-------.   .-------.      .-----------------.     .-------.
+ * |audiotestsrc|   |Converter|   |Resample|     |OpusEnc|   |OpusPay|      | RtpBin          |     |UdpSink|  RTP
+ * |         src->sink      src->sink    src->sink    src->sink    src->send_rtp   send_rtp->sink   |    port=5002
+ * '------------'   '---------'   '--------'     '-------'   '-------'      |                 |     '-------'
+ *                                                                          |                 |      
+ *                                                                          |                 |     .-------.
+ *                                                                          |                 |     |UdpSink|  RTCP
+ *                                                                          |        send_rtcp->sink        | port=5003
+ *                                                         .-------.        |                 |     '-------' 
+ *                                                 RTCP    |UdpSrc |        |                 |               
+ *                                             port=5007   |    src->recv_rtcp                |                       
+ *                                                         '-------'        '-----------------'              
+ */                           
 
 /* change this to send the RTP data and RTCP to another host */
-// #define DEST_HOST "127.0.0.1"
 
 char FIRST_CLIENT_IP[] = "172.30.48.122";
 char SECOND_CLINET_IP[] = "172.30.49.65";
 
 char* DEST_HOST[] = {FIRST_CLIENT_IP, SECOND_CLINET_IP};
 
-
-/* #define AUDIO_SRC  "alsasrc" */
-// #define AUDIO_SRC  "jackaudiosrc"
 #define AUDIO_SRC  "audiotestsrc"
 
 /* the encoder and payloader elements */

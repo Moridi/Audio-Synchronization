@@ -6,6 +6,7 @@
 #include <stdio.h>
 
 #include <gst/gst.h>
+#include <gst/gstclock.h>
 #include "Config.h"
 #include "Logger.h"
 
@@ -89,10 +90,12 @@ void add_decoder()
     audiores = gst_element_factory_make("audioresample", "audiores");
     g_assert(audiores);
 
-    // @TODO: drift-tolerance, sync, slave-method
     audiosink = gst_element_factory_make(AUDIO_SINK, "audiosink");
     g_assert(audiosink);
-    g_object_set(audiosink, "sync", TRUE, NULL);
+    g_object_set(audiosink, "sync", TRUE,
+            "drift-tolerance", 40000,
+            "alignemnt-threshold", 10 * GST_MSECOND,
+            "slave-method", 1, NULL);
 
     /* add depayloading and playback to the pipeline and link */
     gst_bin_add_many(GST_BIN(pipeline), audiodepay, audiodec, audioconv,
@@ -109,9 +112,6 @@ void add_rtpbin()
     rtpbin = gst_element_factory_make("rtpbin", "rtpbin");
     g_assert(rtpbin);
 
-    // @TODO: Uncomment it.
-    // BUFFER_MODE_NONE = 0
-    // g_object_set(rtpbin, "buffer-mode", 0, NULL);
     g_object_set(rtpbin, "ntp-sync", TRUE, NULL);
 
     gst_bin_add(GST_BIN(pipeline), rtpbin);

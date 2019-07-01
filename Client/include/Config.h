@@ -28,12 +28,12 @@
 
 #define AUDIO_DEPAY "rtpopusdepay"
 #define AUDIO_DEC   "opusdec"
-#define AUDIO_SINK  "autoaudiosink"
+#define AUDIO_SINK  "alsasink"
 
 /* the destination machine to send RTCP to. This is the address of the sender and
  * is used to send back the RTCP reports of this receiver. If the data is sent
  * from another machine, change this address. */
-#define DEST_HOST "127.0.0.1"
+#define DEST_HOST "192.168.43.56"
 
 #define RTP_PORT_IDX 0
 #define RTCP_SEND_PORT_IDX 1

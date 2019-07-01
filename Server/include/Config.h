@@ -23,8 +23,9 @@
 
 /* change this to send the RTP data and RTCP to another host */
 
-char FIRST_CLIENT_IP[] = "172.30.48.122";
-char SECOND_CLINET_IP[] = "172.30.49.65";
+// char FIRST_CLIENT_IP[] = "192.168.1.8";
+char FIRST_CLIENT_IP[] = "127.0.0.1";
+char SECOND_CLINET_IP[] = "172.20.10.3";
 
 char* DEST_HOST[] = {FIRST_CLIENT_IP, SECOND_CLINET_IP};
 
